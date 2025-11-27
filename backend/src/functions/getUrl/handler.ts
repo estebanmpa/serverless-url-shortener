@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { getShortUrlService } from './service.js';
-import { CreateShortUrlRequest, GetShortUrlRequest } from '../../common/types.js';
+import { getUrlService } from './service.js';
+import { GetUrlRequest } from '../../common/types.js';
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -25,10 +25,10 @@ export const handler = async (
 
     try {
         // Parse request body
-        const body: GetShortUrlRequest = JSON.parse(event.body || '{}');
+        const body: GetUrlRequest = JSON.parse(event.body || '{}');
 
         // Call service
-        const result = await getShortUrlService(body);
+        const result = await getUrlService(body);
 
         return {
             statusCode: 200,
@@ -37,9 +37,9 @@ export const handler = async (
         };
     } catch (error) {
         console.error('Error:', error);
-        
+
         const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-        
+
         return {
             statusCode: 400,
             headers: CORS_HEADERS,

@@ -27,9 +27,3 @@ export function buildShortUrl(shortCode: string): string {
     const baseUrl = process.env.API_BASE_URL || 'https://example.com';
     return `${baseUrl}/${shortCode}`;
 }
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 576c451 (Add lambda functions.)
