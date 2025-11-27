@@ -4,12 +4,12 @@ export interface CreateShortUrlRequest {
 }
 
 // Request type for getting a URL
-export interface GetShortUrlRequest {
+export interface GetUrlRequest {
     shortCode: string
 }
 
 // Response type from the API
-export interface ShortUrlResponse {
+export interface UrlResponse {
     url: string
     shortUrl: string
 }

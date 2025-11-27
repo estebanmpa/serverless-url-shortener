@@ -39,6 +39,7 @@ export default function HomePage() {
     } = useForm<UrlFormData>({
         resolver: zodResolver(urlSchema),
         mode: 'onChange',
+        defaultValues: { url: '' }
     })
 
     // Use the custom hook from hooks folder
@@ -142,10 +143,6 @@ export default function HomePage() {
                         </Stack>
                     </form>
                 </Paper>
-
-                <Text size="sm" c="dimmed" ta="center">
-                    Built with React, Mantine UI, and AWS Serverless
-                </Text>
             </Stack>
         </Container>
     )

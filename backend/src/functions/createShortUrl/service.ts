@@ -1,7 +1,7 @@
-import { CreateShortUrlRequest, ShortUrlResponse } from '../../common/types.js';
+import { CreateShortUrlRequest, UrlResponse } from '../../common/types.js';
 import { generateShortCode, isValidUrl, buildShortUrl } from '../../common/utils.js';
 
-export async function createShortUrlService({ url }: CreateShortUrlRequest): Promise<ShortUrlResponse> {
+export async function createShortUrlService({ url }: CreateShortUrlRequest): Promise<UrlResponse> {
     // Validate URL
     if (!url || !isValidUrl(url)) {
         throw new Error('Invalid URL format.');
@@ -11,7 +11,7 @@ export async function createShortUrlService({ url }: CreateShortUrlRequest): Pro
     const shortCode = generateShortCode();
     const shortUrl = buildShortUrl(shortCode)
 
-    const response: ShortUrlResponse = {
+    const response: UrlResponse = {
         url,
         shortUrl
     }

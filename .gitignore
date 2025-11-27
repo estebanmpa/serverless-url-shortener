@@ -1,15 +1,6 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-venv/
-*.egg-info/
 
 # AWS SAM
 .aws-sam/
@@ -21,14 +12,6 @@ samconfig.toml
 
 # IDE
 .vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
 
 # Build outputs
 dist/
@@ -37,6 +20,7 @@ build/
 
 # Logs
 *.log
+
 
 
 
