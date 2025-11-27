@@ -28,5 +28,8 @@ export function buildShortUrl(shortCode: string): string {
     return `${baseUrl}/${shortCode}`;
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 576c451 (Add lambda functions.)

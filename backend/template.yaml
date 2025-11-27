@@ -1,0 +1,154 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: URL Shortener Service - Serverless API with DynamoDB
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref UrlShortenerTable
+        API_BASE_URL: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Environment name
+
+Resources:
+
+  # Lambda Function - Create Short URL
+  CreateShortUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'url-shortener-create-${Environment}'
+      CodeUri: dist/functions/createShortUrl/
+      Handler: handler.handler
+      Description: Creates a short URL and stores it in DynamoDB
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UrlShortenerTable
+      Events:
+        CreateShortUrl:
+          Type: Api
+          Properties:
+            Path: /shorten
+            Method: POST
+            RestApiId: !Ref ServerlessRestApi
+        CreateShortUrlOptions:
+          Type: Api
+          Properties:
+            Path: /shorten
+            Method: OPTIONS
+            RestApiId: !Ref ServerlessRestApi
+      Tags:
+        Environment: !Ref Environment
+        Application: UrlShortener
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - handler.ts
+        Banner:
+          js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+
+  # Lambda Function - Get Redirect
+  GetRedirectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'url-shortener-redirect-${Environment}'
+      CodeUri: dist/functions/getRedirect/
+      Handler: handler.handler
+      Description: Retrieves original URL and redirects
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UrlShortenerTable
+      Events:
+        GetRedirect:
+          Type: Api
+          Properties:
+            Path: /{shortCode}
+            Method: GET
+            RestApiId: !Ref ServerlessRestApi
+        GetRedirectOptions:
+          Type: Api
+          Properties:
+            Path: /{shortCode}
+            Method: OPTIONS
+            RestApiId: !Ref ServerlessRestApi
+      Tags:
+        Environment: !Ref Environment
+        Application: UrlShortener
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - handler.ts
+        Banner:
+          js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+
+  # API Gateway
+  ServerlessRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub 'url-shortener-api-${Environment}'
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET, POST, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+      TracingEnabled: true
+      Tags:
+        Environment: !Ref Environment
+        Application: UrlShortener
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiEndpoint'
+
+  CreateShortUrlFunctionArn:
+    Description: Create Short URL Lambda Function ARN
+    Value: !GetAtt CreateShortUrlFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CreateFunctionArn'
+
+  GetRedirectFunctionArn:
+    Description: Get Redirect Lambda Function ARN
+    Value: !GetAtt GetRedirectFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-RedirectFunctionArn'
+
+  DynamoDBTableName:
+    Description: DynamoDB Table Name
+    Value: !Ref UrlShortenerTable
+    Export:
+      Name: !Sub '${AWS::StackName}-TableName'
+
+  DynamoDBTableArn:
+    Description: DynamoDB Table ARN
+    Value: !GetAtt UrlShortenerTable.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-TableArn'
+
