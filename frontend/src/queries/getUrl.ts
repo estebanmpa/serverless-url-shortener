@@ -1,6 +1,6 @@
-import { GetUrlRequest, UrlResponse } from "@/types/types"
+import { GetUrlRequest, UrlResponse } from '@/types/types'
 
-const API_ENDPOINT = 'https://your-api-gateway-url.amazonaws.com/Prod'
+const API_ENDPOINT = import.meta.env.VITE_API_GATEWAY_BASE_URL
 
 /**
  * API function to get the redirect URL from a short code
