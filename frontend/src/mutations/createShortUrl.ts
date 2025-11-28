@@ -1,6 +1,6 @@
 import { CreateShortUrlRequest, UrlResponse } from '@/types/types'
 
-const API_ENDPOINT = import.meta.env.VITE_API_GATEWAY_BASE_URL
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
 
 /**
  * API function to create a short URL
