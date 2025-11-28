@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: URL Shortener Serverless Service
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Environment name
+
+Resources:
+  WebAppS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'url-shortener-frontend-${Environment}'
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+
+  WebAppS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebAppS3Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: Allow
+            Resource: !Sub 'arn:aws:s3:::${WebAppS3Bucket}/*'
+            Principal: '*'
+
+  CreateShortUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'url-shortener-create-${Environment}'
+      CodeUri: ../backend/
+      Handler: src/functions/createShortUrl/index.handler
+      Description: Creates a short URL and stores it in DynamoDB
+      Events:
+        CreateShortUrl:
+          Type: Api
+          Properties:
+            Path: /url
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - src/functions/createShortUrl/index.ts
+
+  GetUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'url-shortener-get-${Environment}'
+      CodeUri: ../backend/
+      Handler: src/functions/getUrl/index.handler
+      Description: Retrieves original URL and redirects
+      Events:
+        GetUrl:
+          Type: Api
+          Properties:
+            Path: /url/{shortCode}
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - src/functions/getUrl/index.ts
+
+Outputs:
+  WebAppS3BucketName:
+    Description: S3 bucket name for the frontend web application
+    Value: !Ref WebAppS3Bucket
+    Export:
+      Name: !Sub '${AWS::StackName}-WebAppS3BucketName'
+
+  WebAppS3BucketWebsiteURL:
+    Description: S3 bucket website URL
+    Value: !GetAtt WebAppS3Bucket.WebsiteURL
+    Export:
+      Name: !Sub '${AWS::StackName}-WebAppS3BucketWebsiteURL'
+
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiEndpoint'
+
+  CreateShortUrlFunctionArn:
+    Description: Create Short URL Lambda Function ARN
+    Value: !GetAtt CreateShortUrlFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CreateFunctionArn'
+
+  GetUrlFunctionArn:
+    Description: Get Redirect Lambda Function ARN
+    Value: !GetAtt GetUrlFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-GetUrlFunctionArn'

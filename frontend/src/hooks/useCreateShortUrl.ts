@@ -1,22 +1,22 @@
 import { useMutation, UseMutationResult } from '@tanstack/react-query'
 import { createShortUrlMutation } from '@/mutations/createShortUrl'
-import { CreateShortUrl, ShortUrlResponse } from '@/types/types'
+import { CreateShortUrlRequest, UrlResponse } from '@/types/types'
 
 /**
  * Custom hook that wraps the createShortUrl mutation
  * This hook can be used in components to shorten URLs
  */
 export function useCreateShortUrl(): UseMutationResult<
-    ShortUrlResponse,
+    UrlResponse,
     Error,
-    CreateShortUrl
+    CreateShortUrlRequest
 > {
-    return useMutation<ShortUrlResponse, Error, CreateShortUrl>({
+    return useMutation<UrlResponse, Error, CreateShortUrlRequest>({
         mutationFn: createShortUrlMutation,
-        onSuccess: (data) => {
+        onSuccess: (data: UrlResponse) => {
             console.log('URL shortened successfully:', data)
         },
-        onError: (error) => {
+        onError: (error: Error) => {
             console.error('Failed to shorten URL:', error)
         },
     })

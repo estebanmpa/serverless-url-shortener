@@ -19,6 +19,7 @@ import {
 import { notifications } from '@mantine/notifications'
 import { IconLink, IconCopy, IconCheck } from '@tabler/icons-react'
 import { useCreateShortUrl } from '@/hooks/useCreateShortUrl'
+import { UrlResponse } from '@/types/types'
 
 // Zod validation schema
 const urlSchema = z.object({
@@ -39,6 +40,7 @@ export default function HomePage() {
     } = useForm<UrlFormData>({
         resolver: zodResolver(urlSchema),
         mode: 'onChange',
+        defaultValues: { url: '' }
     })
 
     // Use the custom hook from hooks folder
@@ -47,7 +49,7 @@ export default function HomePage() {
     const onSubmit = (data: UrlFormData): void => {
         setShortUrl('')
         createShortUrl(data, {
-            onSuccess: (responseData) => {
+            onSuccess: (responseData: UrlResponse) => {
                 setShortUrl(responseData.shortUrl)
                 notifications.show({
                     title: 'Success!',
@@ -55,7 +57,7 @@ export default function HomePage() {
                     color: 'green',
                 })
             },
-            onError: (error) => {
+            onError: (error: Error) => {
                 notifications.show({
                     title: 'Error',
                     message: error.message || 'Failed to create short URL',
@@ -142,10 +144,6 @@ export default function HomePage() {
                         </Stack>
                     </form>
                 </Paper>
-
-                <Text size="sm" c="dimmed" ta="center">
-                    Built with React, Mantine UI, and AWS Serverless
-                </Text>
             </Stack>
         </Container>
     )

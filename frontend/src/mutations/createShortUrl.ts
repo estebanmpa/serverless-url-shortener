@@ -1,13 +1,13 @@
-import { CreateShortUrl, ShortUrlResponse } from '@/types/types'
+import { CreateShortUrlRequest, UrlResponse } from '@/types/types'
 
-const API_ENDPOINT = 'https://your-api-gateway-url.amazonaws.com'
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
 
 /**
  * API function to create a short URL
  * This is a pure function that makes the API call
  */
-export const createShortUrlMutation = async (data: CreateShortUrl): Promise<ShortUrlResponse> => {
-    const response = await fetch(`${API_ENDPOINT}/shorten`, {
+export const createShortUrlMutation = async (data: CreateShortUrlRequest): Promise<UrlResponse> => {
+    const response = await fetch(`${API_ENDPOINT}/url`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
