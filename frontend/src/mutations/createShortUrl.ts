@@ -1,13 +1,13 @@
 import { CreateShortUrlRequest, UrlResponse } from '@/types/types'
+import { Configuration } from '@/utils/config'
 
-const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
 
 /**
  * API function to create a short URL
  * This is a pure function that makes the API call
  */
 export const createShortUrlMutation = async (data: CreateShortUrlRequest): Promise<UrlResponse> => {
-    const response = await fetch(`${API_ENDPOINT}/url`, {
+    const response = await fetch(`${Configuration.ApiGatewayBaseUrl}/url`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

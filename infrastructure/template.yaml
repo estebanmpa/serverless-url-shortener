@@ -24,8 +24,9 @@ Resources:
   WebAppS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub 'url-shortener-frontend-${Environment}'
-      AccessControl: PublicRead
+      BucketName: !Sub 'estebandev-url-shortener-frontend-${Environment}'
+      PublicAccessBlockConfiguration:
+        BlockPublicPolicy: false
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
@@ -42,6 +43,11 @@ Resources:
             Resource: !Sub 'arn:aws:s3:::${WebAppS3Bucket}/*'
             Principal: '*'
 
+  UrlShortenerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+
   CreateShortUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -55,6 +61,8 @@ Resources:
           Properties:
             Path: /url
             Method: POST
+            RestApiId: !Ref UrlShortenerApi
+
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -77,6 +85,8 @@ Resources:
           Properties:
             Path: /url/{shortCode}
             Method: GET
+            RestApiId: !Ref UrlShortenerApi
+
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -101,7 +111,7 @@ Outputs:
 
   ApiEndpoint:
     Description: API Gateway endpoint URL
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Value: !Sub 'https://${UrlShortenerApi}.execute-api.${AWS::Region}.amazonaws.com/dev'
     Export:
       Name: !Sub '${AWS::StackName}-ApiEndpoint'
 
