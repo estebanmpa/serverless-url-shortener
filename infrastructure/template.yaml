@@ -6,7 +6,7 @@ Globals:
   Function:
     Timeout: 10
     MemorySize: 128
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     Architectures:
       - x86_64
 
@@ -24,8 +24,9 @@ Resources:
   WebAppS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub 'url-shortener-frontend-${Environment}'
-      AccessControl: PublicRead
+      BucketName: !Sub 'estebandev-url-shortener-frontend-${Environment}'
+      PublicAccessBlockConfiguration:
+        BlockPublicPolicy: false
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
@@ -42,6 +43,23 @@ Resources:
             Resource: !Sub 'arn:aws:s3:::${WebAppS3Bucket}/*'
             Principal: '*'
 
+  UrlShortenerTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'url-shortener-table-${Environment}'
+      AttributeDefinitions:
+        - AttributeName: shortCode
+          AttributeType: S
+      KeySchema:
+        - AttributeName: shortCode
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  UrlShortenerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+
   CreateShortUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -49,16 +67,23 @@ Resources:
       CodeUri: ../backend/
       Handler: src/functions/createShortUrl/index.handler
       Description: Creates a short URL and stores it in DynamoDB
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UrlShortenerTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UrlShortenerTable
       Events:
         CreateShortUrl:
           Type: Api
           Properties:
             Path: /url
             Method: POST
+            RestApiId: !Ref UrlShortenerApi
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -71,16 +96,23 @@ Resources:
       CodeUri: ../backend/
       Handler: src/functions/getUrl/index.handler
       Description: Retrieves original URL and redirects
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UrlShortenerTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UrlShortenerTable
       Events:
         GetUrl:
           Type: Api
           Properties:
             Path: /url/{shortCode}
             Method: GET
+            RestApiId: !Ref UrlShortenerApi
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -101,7 +133,7 @@ Outputs:
 
   ApiEndpoint:
     Description: API Gateway endpoint URL
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Value: !Sub 'https://${UrlShortenerApi}.execute-api.${AWS::Region}.amazonaws.com/dev'
     Export:
       Name: !Sub '${AWS::StackName}-ApiEndpoint'
 

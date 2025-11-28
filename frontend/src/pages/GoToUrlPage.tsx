@@ -12,11 +12,11 @@ export default function GoToUrlPage() {
     const { data, isLoading, isError } = useGetUrl(shortCode)
 
     useEffect(() => {
-        if (data?.shortUrl) {
+        if (data?.url) {
             // Redirect to the original URL
-            window.location.href = data.shortUrl
+            window.location.href = data.url
         }
-    }, [data?.shortUrl])
+    }, [data?.url])
 
     // Show loading state while fetching
     if (isLoading) {

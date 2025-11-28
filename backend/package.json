@@ -6,7 +6,6 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist .aws-sam",
-
     "sam:build": "sam build",
     "sam:deploy": "sam deploy --guided",
     "sam:local": "sam local start-api",

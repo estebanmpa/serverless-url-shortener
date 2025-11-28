@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { Configuration } from './config';
 
 /**
  * Generate a unique short code
@@ -24,9 +25,6 @@ export function isValidUrl(url: string): boolean {
  * Build the full short URL from the short code
  */
 export function buildShortUrl(shortCode: string): string {
-    const baseUrl = process.env.API_BASE_URL || 'https://example.com';
+    const baseUrl = Configuration.ApiBaseUrl;
     return `${baseUrl}/${shortCode}`;
 }
-
-
-
