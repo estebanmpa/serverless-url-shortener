@@ -9,8 +9,6 @@
     "sam:build": "sam build",
     "sam:deploy": "sam deploy --guided",
     "sam:local": "sam local start-api",
-    "sam:invoke:create": "sam local invoke CreateShortUrlFunction --event events/create-url.json",
-    "sam:invoke:redirect": "sam local invoke GetRedirectFunction --event events/redirect.json",
     "package": "yarn run build && yarn run sam:build",
     "deploy": "yarn run package && sam deploy",
     "local": "yarn run build && yarn run sam:local"

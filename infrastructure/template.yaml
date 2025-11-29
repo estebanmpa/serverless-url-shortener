@@ -46,7 +46,7 @@ Resources:
   UrlShortenerTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub 'url-shortener-table-${Environment}'
+      TableName: !Sub 'url-shortener-create-${Environment}'
       AttributeDefinitions:
         - AttributeName: shortCode
           AttributeType: S
@@ -69,7 +69,7 @@ Resources:
       Description: Creates a short URL and stores it in DynamoDB
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlShortenerTable
+          TABLE_NAME: !Sub 'url-shortener-table-${Environment}'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UrlShortenerTable
@@ -98,7 +98,7 @@ Resources:
       Description: Retrieves original URL and redirects
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlShortenerTable
+          TABLE_NAME: !Sub 'url-shortener-table-${Environment}'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UrlShortenerTable
@@ -122,29 +122,7 @@ Outputs:
   WebAppS3BucketName:
     Description: S3 bucket name for the frontend web application
     Value: !Ref WebAppS3Bucket
-    Export:
-      Name: !Sub '${AWS::StackName}-WebAppS3BucketName'
-
-  WebAppS3BucketWebsiteURL:
-    Description: S3 bucket website URL
-    Value: !GetAtt WebAppS3Bucket.WebsiteURL
-    Export:
-      Name: !Sub '${AWS::StackName}-WebAppS3BucketWebsiteURL'
 
   ApiEndpoint:
     Description: API Gateway endpoint URL
-    Value: !Sub 'https://${UrlShortenerApi}.execute-api.${AWS::Region}.amazonaws.com/dev'
-    Export:
-      Name: !Sub '${AWS::StackName}-ApiEndpoint'
-
-  CreateShortUrlFunctionArn:
-    Description: Create Short URL Lambda Function ARN
-    Value: !GetAtt CreateShortUrlFunction.Arn
-    Export:
-      Name: !Sub '${AWS::StackName}-CreateFunctionArn'
-
-  GetUrlFunctionArn:
-    Description: Get Redirect Lambda Function ARN
-    Value: !GetAtt GetUrlFunction.Arn
-    Export:
-      Name: !Sub '${AWS::StackName}-GetUrlFunctionArn'
+    Value: !Sub 'https://${UrlShortenerApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
