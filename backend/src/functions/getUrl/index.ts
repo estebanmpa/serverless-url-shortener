@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getUrlService } from './service.js';
+import { LambdaResponse } from '../../common/returns.js';
 
 
 export const handler = async (
@@ -12,29 +13,10 @@ export const handler = async (
             throw new Error('Short URL not found');
         }
 
-        // Call service
         const result = await getUrlService({ shortCode });
-
-        return {
-            statusCode: 200,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(result),
-        };
+        return LambdaResponse(200, result);
     } catch (error) {
-        console.error('Error:', error);
-
         const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-
-        return {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            statusCode: 400,
-            body: JSON.stringify({
-                message: errorMessage,
-            }),
-        };
+        return LambdaResponse(400, { message: errorMessage });
     }
 };

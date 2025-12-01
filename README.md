@@ -1,8 +1,9 @@
-# 🔗 URL Shortener - AWS Serverless
+# URL Shortener - AWS Serverless
 
-A modern, full-stack serverless URL shortener built with React, TypeScript, AWS Lambda, DynamoDB, and API Gateway.
+Full-stack serverless URL shortener built with React, TypeScript, AWS Lambda, DynamoDB, and API Gateway.
+The deploy is managed by AWS SAM (Serverless Application Model) templates.
 
-## ✨ Features
+## Features
 
 -   **Serverless Architecture:** Automatically scales, no server management.
 -   **Fast & Efficient:** Powered by AWS Lambda and DynamoDB.
@@ -10,7 +11,7 @@ A modern, full-stack serverless URL shortener built with React, TypeScript, AWS 
 -   **Type-Safe:** Full TypeScript for frontend & backend.
 -   **Local Development:** Test locally with AWS SAM CLI.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -37,7 +38,7 @@ A modern, full-stack serverless URL shortener built with React, TypeScript, AWS 
     ```
     Frontend will be available at `http://localhost:5173`
 
-## 📦 Deployment
+## Deployment
 
 ### Backend Deployment
 
@@ -70,11 +71,7 @@ The API Gateway endpoint URL will be in the stack outputs.
     ```
     Replace `YOUR_FRONTEND_BUCKET_NAME` with the S3 bucket name from your SAM stack outputs.
 
-## 🛠️ Development Scripts
+## Development Scripts
 
 -   **Frontend:** `npm run dev`, `npm run build`
 -   **Backend:** `npm run build`, `npm run local`, `npm run deploy`
-
-## 📝 License
-
-MIT

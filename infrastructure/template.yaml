@@ -46,7 +46,7 @@ Resources:
   UrlShortenerTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub 'url-shortener-create-${Environment}'
+      TableName: !Sub 'url-shortener-table-${Environment}'
       AttributeDefinitions:
         - AttributeName: shortCode
           AttributeType: S
@@ -55,10 +55,14 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
-  UrlShortenerApi:
+  ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: dev
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type'"
+        AllowMethods: "'GET,POST,OPTIONS'"
 
   CreateShortUrlFunction:
     Type: AWS::Serverless::Function
@@ -79,7 +83,7 @@ Resources:
           Properties:
             Path: /url
             Method: POST
-            RestApiId: !Ref UrlShortenerApi
+            RestApiId: !Ref ApiGatewayApi
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -108,7 +112,7 @@ Resources:
           Properties:
             Path: /url/{shortCode}
             Method: GET
-            RestApiId: !Ref UrlShortenerApi
+            RestApiId: !Ref ApiGatewayApi
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -125,4 +129,4 @@ Outputs:
 
   ApiEndpoint:
     Description: API Gateway endpoint URL
-    Value: !Sub 'https://${UrlShortenerApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Value: !Sub 'https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
